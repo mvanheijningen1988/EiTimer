@@ -48,7 +48,7 @@ function startTimer() {
     logMessage('Initialiseer de Web Worker', 'debug');
     if (typeof Worker !== 'undefined') {
         logMessage('Web Workers worden ondersteund in deze browser.', 'debug');
-        timerWorker = new Worker('timerWorker.js');
+        timerWorker = new Worker('timerworker.js');
         logMessage('Web Worker gestart', 'debug');
         timerWorker.postMessage({ command: 'start', time });
 
