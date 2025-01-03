@@ -24,7 +24,7 @@ function askWaterBoiling(isBoiling = false) {
 }
 
 function startTimer() {
-    const time = eggType === 'hard' ? 10 * 60 : 0.1 * 60; // Tijd in seconden
+    const time = eggType === 'hard' ? 10 * 60 : 8 * 60; // Tijd in seconden
     let remainingTime = time;
 
     content.innerHTML = `
