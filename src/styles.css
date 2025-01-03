@@ -1,7 +1,9 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    color: #333;
+    background-color: #f7f8fa;
+    /* Lichtgrijs */
+    color: #003d79;
+    /* Donkerblauw */
     text-align: center;
     margin: 0;
     padding: 20px;
@@ -16,11 +18,21 @@ main {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+h1 {
+    font-size: 36px;
+    font-weight: bold;
+    color: #0076c0;
+    /* Blauw */
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
 button {
     padding: 10px 20px;
     margin: 10px;
     font-size: 16px;
-    background-color: #4CAF50;
+    background-color: #0076c0;
+    /* Blauw */
     color: white;
     border: none;
     border-radius: 4px;
@@ -28,7 +40,8 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #005ea3;
+    /* Donkerder blauw */
 }
 
 .hidden {
@@ -60,7 +73,8 @@ button:hover {
     margin-top: 10px;
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #4CAF50;
+    background-color: #0076c0;
+    /* Blauw */
     color: white;
     border: none;
     border-radius: 4px;
@@ -68,13 +82,15 @@ button:hover {
 }
 
 #overlay-content button:hover {
-    background-color: #45a049;
+    background-color: #005ea3;
+    /* Donkerder blauw */
 }
 
 #timer-display {
     font-size: 48px;
     font-weight: bold;
-    color: #4CAF50;
+    color: #0076c0;
+    /* Blauw */
     margin-top: 10px;
 }
 
@@ -102,19 +118,23 @@ button:hover {
 
 #finished-overlay #overlay-content h2 {
     font-size: 24px;
-    color: #4CAF50;
+    color: #0076c0;
+    /* Blauw */
 }
 
 #finished-overlay #overlay-content p {
     font-size: 18px;
     margin-top: 10px;
+    color: #003d79;
+    /* Donkerblauw */
 }
 
 #finished-overlay button {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #4CAF50;
+    background-color: #0076c0;
+    /* Blauw */
     color: white;
     border: none;
     border-radius: 4px;
@@ -122,7 +142,8 @@ button:hover {
 }
 
 #finished-overlay button:hover {
-    background-color: #45a049;
+    background-color: #005ea3;
+    /* Donkerder blauw */
 }
 
 @keyframes fadeIn {
@@ -139,7 +160,8 @@ button:hover {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 16px;
-    background-color: #4CAF50;
+    background-color: #0076c0;
+    /* Blauw */
     color: white;
     border: none;
     border-radius: 4px;
@@ -147,5 +169,6 @@ button:hover {
 }
 
 #restart-button:hover {
-    background-color: #45a049;
+    background-color: #005ea3;
+    /* Donkerder blauw */
 }
