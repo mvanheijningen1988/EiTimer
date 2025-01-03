@@ -1,21 +1,14 @@
-self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open('egg-timer-cache').then((cache) => {
-            return cache.addAll(['/', '/index.html', '/styles.css', '/script.js']);
-        })
-    );
+self.addEventListener('install', event => {
+    console.log('Service Worker installed');
+    self.skipWaiting();
 });
 
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-        })
-    );
+self.addEventListener('activate', event => {
+    console.log('Service Worker activated');
 });
 
-self.addEventListener('sync', (event) => {
-    if (event.tag === 'sync-message') {
-        alert('sw sync-message');
+self.addEventListener('periodicsync', event => {
+    if (event.tag === 'check-time') {
+        event.waitUntil(alert("test"));
     }
 });

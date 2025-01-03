@@ -19,26 +19,24 @@ function checkPermission() {
 }
 
 async function sw() {
-    if ("serviceWorker" in navigator) {
-        // Register a service worker hosted at the root of the
-        // site using the default scope.
-        navigator.serviceWorker.register("/sw.js").then(
-            (registration) => {
-                console.log("Service worker registration succeeded:", registration);
-            },
-            (error) => {
-                console.error(`Service worker registration failed: ${error}`);
-            },
-        );
+    // Check if the browser supports Periodic Background Sync
+    if ('serviceWorker' in navigator && 'periodicSync' in navigator.serviceWorker) {
+        navigator.serviceWorker.register('sw.js').then(async (registration) => {
+            console.log('Service Worker registered:', registration);
 
-        const registration = await navigator.serviceWorker.ready;
-        try {
-            await registration.sync.register("sync-messages");
-        } catch {
-            console.log("Background Sync could not be registered!");
-        }
+            const permission = await navigator.permissions.query({ name: 'periodic-background-sync' });
+            if (permission.state === 'granted') {
+                await registration.periodicSync.register('check-time', {
+                    minInterval: 10 * 1000 // 1 minute
+                });
+                alert('Periodic Background Sync enabled!');
+            } else {
+                alert('Permission denied for Periodic Background Sync.');
+            }
+
+        });
     } else {
-        console.error("Service workers are not supported.");
+        console.warn('Periodic Background Sync is not supported in this browser.');
     }
 
 }
