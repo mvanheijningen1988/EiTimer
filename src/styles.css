@@ -172,3 +172,40 @@ button:hover {
     background-color: #005ea3;
     /* Donkerder blauw */
 }
+
+/* Algemene stijl voor log items */
+#logs li {
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Stijl voor info logs */
+#logs .info {
+    background-color: #e7f3fe;
+    color: #31708f;
+    border: 1px solid #bce8f1;
+}
+
+/* Stijl voor waarschuwingen */
+#logs .warn {
+    background-color: #fcf8e3;
+    color: #8a6d3b;
+    border: 1px solid #faebcc;
+}
+
+/* Stijl voor fouten */
+#logs .error {
+    background-color: #f2dede;
+    color: #a94442;
+    border: 1px solid #ebccd1;
+}
+
+/* Stijl voor debug logs */
+#logs .debug {
+    background-color: #f4f4f4;
+    color: #555555;
+    border: 1px solid #dddddd;
+    font-style: italic;
+}

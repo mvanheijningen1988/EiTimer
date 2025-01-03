@@ -1,9 +1,19 @@
 let eggType = '';
+let timerWorker;
 const content = document.getElementById('content');
+const logs = document.getElementById('logs');
 const alarmSound = new Audio('alarm.wav'); // Voeg je alarmgeluid toe
 alarmSound.loop = true; // Herhaal het geluid
 
+function logMessage(message, type = 'info') {
+    const logItem = document.createElement('li');
+    logItem.textContent = message;
+    logItem.className = type; // Voeg een class toe, bijvoorbeeld 'info', 'warn', of 'error'
+    logs.appendChild(logItem);
+}
+
 function setEggPreference(type) {
+    logMessage(`Ei voorkeur: ${type}`, 'debug');
     eggType = type;
     content.innerHTML = `
     <p>Zet een pan water op het gasfornuis en voeg een beetje zout toe.</p>
@@ -13,6 +23,7 @@ function setEggPreference(type) {
 }
 
 function askWaterBoiling(isBoiling = false) {
+    logMessage(`Is het water aan het koken? ${isBoiling}`, 'debug');
     if (!isBoiling) {
         showOverlay();
     } else {
@@ -24,36 +35,55 @@ function askWaterBoiling(isBoiling = false) {
 }
 
 function startTimer() {
+    logMessage(`Timer gestart voor ${eggType === 'hard' ? 'hardgekookt' : 'zachtgekookt'} ei`, 'debug');
+
     const time = eggType === 'hard' ? 10 * 60 : 8 * 60; // Tijd in seconden
-    let remainingTime = time;
 
     content.innerHTML = `
     <p>Timer loopt... Tijd over:</p>
     <h2 id="timer-display"></h2>
   `;
 
+    // Initialiseer de Web Worker
+    logMessage('Initialiseer de Web Worker', 'debug');
+    if (typeof Worker !== 'undefined') {
+        logMessage('Web Workers worden ondersteund in deze browser.', 'debug');
+        timerWorker = new Worker('timerWorker.js');
+        logMessage('Web Worker gestart', 'debug');
+        timerWorker.postMessage({ command: 'start', time });
+
+        logMessage('Web Worker luistert naar berichten...', 'debug');
+        timerWorker.onmessage = function (e) {
+            logMessage(`Bericht ontvangen: ${JSON.stringify(e.data)}`, 'debug');
+            const { command, remainingTime } = e.data;
+
+            if (command === 'update') {
+                updateTimerDisplay(remainingTime);
+            } else if (command === 'finished') {
+                showFinishedOverlay();
+                timerWorker.terminate();
+            }
+        };
+    } else {
+        logMessage('Web Workers worden niet ondersteund in deze browser.', 'error');
+        console.error('Web Workers worden niet ondersteund in deze browser.');
+    }
+}
+
+function updateTimerDisplay(remainingTime) {
+    const minutes = Math.floor(remainingTime / 60);
+    const seconds = remainingTime % 60;
     const timerDisplay = document.getElementById('timer-display');
-
-    // Update de timer elke seconde
-    const timerInterval = setInterval(() => {
-        const minutes = Math.floor(remainingTime / 60);
-        const seconds = remainingTime % 60;
-
-        timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-        if (remainingTime === 0) {
-            clearInterval(timerInterval);
-            showFinishedOverlay(); // Toon de overlay wanneer de timer verloopt
-        }
-
-        remainingTime -= 1;
-    }, 1000);
+    timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 function showFinishedOverlay() {
     // Laat het geluid spelen en apparaat trillen
+    logMessage('Timer afgelopen!', 'info');
+    logMessage('Speel alarmgeluid af en laat apparaat trillen', 'debug');
     alarmSound.play();
     if ("vibrate" in navigator) {
+        logMessage('Tril het apparaat', 'debug');
         navigator.vibrate([500, 200, 500]); // Trillingspatroon
     }
 
@@ -68,9 +98,12 @@ function showFinishedOverlay() {
 
 function closeFinishedOverlay() {
     // Stop het geluid en het trillen
+    logMessage('Sluit de overlay', 'info');
+    logMessage('Stop het alarmgeluid en reset het geluid', 'debug');
     alarmSound.pause();
     alarmSound.currentTime = 0; // Reset het geluid
     if ("vibrate" in navigator) {
+        logMessage('Stop het trillen', 'debug');
         navigator.vibrate(0); // Stop trillen
     }
 
@@ -78,6 +111,7 @@ function closeFinishedOverlay() {
     const overlay = document.getElementById('finished-overlay');
     overlay.classList.add('hidden');
     content.innerHTML = `<p>Geniet van je ${eggType === 'hard' ? 'hardgekookte' : 'zachtgekookte'} eieren!</p>`;
+
     const restartButton = document.createElement('button');
     restartButton.textContent = "Ik wil meer eieren";
     restartButton.onclick = restartApp;
@@ -107,6 +141,12 @@ function restartApp() {
     <button onclick="setEggPreference('hard')">Hardgekookt</button>
     <button onclick="setEggPreference('soft')">Zachtgekookt</button>
   `;
+}
+
+// if parameter debug is provided in the URL, show logs
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('debug')) {
+    logs.classList.remove('hidden');
 }
 
 restartApp(); // Start de app
