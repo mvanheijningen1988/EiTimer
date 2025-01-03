@@ -149,4 +149,5 @@ if (urlParams.has('debug')) {
     logs.classList.remove('hidden');
 }
 
+logMessage('App gestart', 'info');
 restartApp(); // Start de app
