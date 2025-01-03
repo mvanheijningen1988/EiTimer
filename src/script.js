@@ -1,7 +1,16 @@
 let eggType = '';
 const content = document.getElementById('content');
+const logs = document.getElementById('logs');
 const alarmSound = new Audio('alarm.wav'); // Voeg je alarmgeluid toe
+
 alarmSound.loop = true; // Herhaal het geluid
+
+function logMessage(message, type = 'info') {
+    const logItem = document.createElement('li');
+    logItem.textContent = message;
+    logItem.className = type; // Voeg een class toe, bijvoorbeeld 'info', 'warn', of 'error'
+    logs.appendChild(logItem);
+}
 
 function setEggPreference(type) {
     eggType = type;
@@ -35,10 +44,12 @@ async function startTimer() {
         navigator.serviceWorker.ready.then((registration) => {
             registration.sync.register('eggquadis-timer').then(() => {
                 console.log('Timer geregistreerd voor background sync');
+                logMessage('Timer geregistreerd voor background sync', 'info');
             });
         });
     } else {
         console.warn('Background Sync wordt niet ondersteund.');
+        logMessage('Background Sync wordt niet ondersteund.', 'warn');
         runTimerLocally(duration);
     }
 }
@@ -77,8 +88,10 @@ function runTimerLocally(duration) {
 function showFinishedOverlay() {
     // Laat het geluid spelen en apparaat trillen
     alarmSound.play();
+    logMessage('Play alarm sound', 'info');
     if ('vibrate' in navigator) {
         navigator.vibrate([500, 200, 500]); // Trillingspatroon
+        logMessage('Start vibrating', 'info');
     }
 
     // Dynamische tekst invoegen
@@ -93,9 +106,11 @@ function showFinishedOverlay() {
 function closeFinishedOverlay() {
     // Stop het geluid en het trillen
     alarmSound.pause();
+    logMessage('Stop alarm sound', 'info');
     alarmSound.currentTime = 0; // Reset het geluid
     if ('vibrate' in navigator) {
         navigator.vibrate(0); // Stop trillen
+        logMessage('Stop vibrating', 'info');
     }
 
     // Verberg de overlay
@@ -136,8 +151,14 @@ function restartApp() {
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
         .register('/sw.js')
-        .then(() => console.log('Service Worker geregistreerd!'))
-        .catch((err) => console.error('Service Worker registratie mislukt:', err));
+        .then(() => {
+            console.log('Service Worker geregistreerd!');
+            logMessage('Service Worker geregistreerd!', 'info');
+        })
+        .catch((err) => {
+            console.error('Service Worker registratie mislukt:', err);
+            logMessage('Service Worker registratie mislukt', 'error');
+        });
 }
 
 restartApp(); // Start de app
