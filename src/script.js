@@ -1,7 +1,34 @@
 let eggType = '';
 const content = document.getElementById('content');
+const logs = document.getElementById('logs');
 const alarmSound = new Audio('alarm.wav'); // Voeg je alarmgeluid toe
 alarmSound.loop = true; // Herhaal het geluid
+
+function checkPermission() {
+    if (!('serviceWorker' in navigator)) {
+        throw new Error("No support for service worker!")
+    }
+
+    if (!('Notification' in window)) {
+        throw new Error("No support for notification API");
+    }
+
+    if (!('PushManager' in window)) {
+        throw new Error("No support for Push API")
+    }
+}
+
+async function sw() {
+    const registration = await navigator.serviceWorker.register('sw.js');
+    registration.sync.register("send-message");
+}
+
+function logMessage(message, type = 'info') {
+    const logItem = document.createElement('li');
+    logItem.textContent = message;
+    logItem.className = type; // Voeg een class toe, bijvoorbeeld 'info', 'warn', of 'error'
+    logs.appendChild(logItem);
+}
 
 function setEggPreference(type) {
     eggType = type;
@@ -109,4 +136,5 @@ function restartApp() {
   `;
 }
 
+checkPermission();
 restartApp(); // Start de app
