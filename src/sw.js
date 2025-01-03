@@ -15,7 +15,7 @@ self.addEventListener('fetch', (event) => {
 });
 
 self.addEventListener('sync', (event) => {
-    if (event.tag === 'send-message') {
-        alert('sw send-message');
+    if (event.tag === 'sync-message') {
+        alert('sw sync-message');
     }
 });

@@ -25,12 +25,18 @@ async function sw() {
         navigator.serviceWorker.register("/sw.js").then(
             (registration) => {
                 console.log("Service worker registration succeeded:", registration);
-                registration.sync.register("send-message");
             },
             (error) => {
                 console.error(`Service worker registration failed: ${error}`);
             },
         );
+
+        const registration = await navigator.serviceWorker.ready;
+        try {
+            await registration.sync.register("sync-messages");
+        } catch {
+            console.log("Background Sync could not be registered!");
+        }
     } else {
         console.error("Service workers are not supported.");
     }
