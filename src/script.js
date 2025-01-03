@@ -23,9 +23,34 @@ function askWaterBoiling(isBoiling = false) {
     }
 }
 
-function startTimer() {
-    const time = eggType === 'hard' ? 10 * 60 : 8 * 60; // Tijd in seconden
-    let remainingTime = time;
+async function startTimer() {
+    const duration = eggType === 'hard' ? 10 * 60 : 8 * 60; // Tijd in seconden
+    const endTime = Date.now() + duration * 1000;
+
+    // Sla timergegevens op in de cache
+    await saveTimerDataToCache({ endTime, eggType });
+
+    // Registreer Background Sync
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready.then((registration) => {
+            registration.sync.register('eggquadis-timer').then(() => {
+                console.log('Timer geregistreerd voor background sync');
+            });
+        });
+    } else {
+        console.warn('Background Sync wordt niet ondersteund.');
+        runTimerLocally(duration);
+    }
+}
+
+async function saveTimerDataToCache(timerData) {
+    const cache = await caches.open('egg-timer-cache');
+    const response = new Response(JSON.stringify(timerData));
+    await cache.put('/timer', response);
+}
+
+function runTimerLocally(duration) {
+    let remainingTime = duration;
 
     content.innerHTML = `
     <p>Timer loopt... Tijd over:</p>
@@ -34,16 +59,15 @@ function startTimer() {
 
     const timerDisplay = document.getElementById('timer-display');
 
-    // Update de timer elke seconde
     const timerInterval = setInterval(() => {
         const minutes = Math.floor(remainingTime / 60);
         const seconds = remainingTime % 60;
 
         timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-        if (remainingTime === 0) {
+        if (remainingTime <= 0) {
             clearInterval(timerInterval);
-            showFinishedOverlay(); // Toon de overlay wanneer de timer verloopt
+            showFinishedOverlay();
         }
 
         remainingTime -= 1;
@@ -53,7 +77,7 @@ function startTimer() {
 function showFinishedOverlay() {
     // Laat het geluid spelen en apparaat trillen
     alarmSound.play();
-    if ("vibrate" in navigator) {
+    if ('vibrate' in navigator) {
         navigator.vibrate([500, 200, 500]); // Trillingspatroon
     }
 
@@ -70,7 +94,7 @@ function closeFinishedOverlay() {
     // Stop het geluid en het trillen
     alarmSound.pause();
     alarmSound.currentTime = 0; // Reset het geluid
-    if ("vibrate" in navigator) {
+    if ('vibrate' in navigator) {
         navigator.vibrate(0); // Stop trillen
     }
 
@@ -79,9 +103,9 @@ function closeFinishedOverlay() {
     overlay.classList.add('hidden');
     content.innerHTML = `<p>Geniet van je ${eggType === 'hard' ? 'hardgekookte' : 'zachtgekookte'} eieren!</p>`;
     const restartButton = document.createElement('button');
-    restartButton.textContent = "Ik wil meer eieren";
+    restartButton.textContent = 'Ik wil meer eieren';
     restartButton.onclick = restartApp;
-    restartButton.id = "restart-button";
+    restartButton.id = 'restart-button';
     content.appendChild(restartButton);
 }
 
@@ -107,6 +131,13 @@ function restartApp() {
     <button onclick="setEggPreference('hard')">Hardgekookt</button>
     <button onclick="setEggPreference('soft')">Zachtgekookt</button>
   `;
+}
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+        .register('/sw.js')
+        .then(() => console.log('Service Worker geregistreerd!'))
+        .catch((err) => console.error('Service Worker registratie mislukt:', err));
 }
 
 restartApp(); // Start de app
