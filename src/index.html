@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
+    <title>Kookwekker voor Eieren</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <main>
+        <h1>Kookwekker voor Eieren</h1>
+        <div id="content">
+        </div>
+    </main>
+    <div id="overlay" class="hidden">
+        <div id="overlay-content">
+            <p>Wacht tot het water kookt!</p>
+            <button onclick="closeOverlay()">OK</button>
+        </div>
+    </div>
+
+    <div id="finished-overlay" class="hidden">
+        <div id="overlay-content">
+            <h2>De eieren zijn klaar!</h2>
+            <p id="overlay-message"></p>
+            <button onclick="closeFinishedOverlay()">OK</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
