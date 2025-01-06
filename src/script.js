@@ -43,7 +43,7 @@ function calculateEggBoilingTimeInSeconds(size, startTemp, desiredConsistency, a
 
     // Calculate total time in seconds
     const boilingTimeInSeconds = Math.round(
-        (baseTime * consistencyMultiplier) + tempAdjustment + altitudeAdjustment
+        baseTime + tempAdjustment + altitudeAdjustment
     );
 
     return boilingTimeInSeconds;
