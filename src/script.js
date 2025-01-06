@@ -1,10 +1,96 @@
 let eggType = '';
-const content = document.getElementById('content');
-const alarmSound = new Audio('alarm.wav'); // Voeg je alarmgeluid toe
-alarmSound.loop = true; // Herhaal het geluid
+let eggConsistency = '';
+let eggSize = 'medium';
+let altitude = 0;
 
-function setEggPreference(type) {
-    eggType = type;
+const content = document.getElementById('content');
+const alarmSound = new Audio('alarm.wav');
+alarmSound.loop = true;
+
+function calculateEggBoilingTimeInSeconds(size, startTemp, desiredConsistency, altitude = 0) {
+
+    const timetable = {
+
+        small: {
+            soft: 240,
+            medium: 300,
+            hard: 360
+        },
+        medium: {
+            soft: 300,
+            medium: 360,
+            hard: 420
+        },
+        large: {
+            soft: 360,
+            medium: 420,
+            hard: 480
+        },
+        extraLarge: {
+            soft: 420,
+            medium: 480,
+            hard: 540
+        }
+    }
+    // Validate egg size
+    const baseTime = timetable[size.toLowerCase()][desiredConsistency.toLowerCase()];
+
+    // Adjust base time based on starting temperature
+    const tempAdjustment = (20 - startTemp) * 2; // ~2 seconds per degree difference from 20°C
+
+    // Adjust for altitude
+    const altitudeAdjustment = altitude * 0.005; // ~0.005 seconds per meter altitude
+
+    // Calculate total time in seconds
+    const boilingTimeInSeconds = Math.round(
+        (baseTime * consistencyMultiplier) + tempAdjustment + altitudeAdjustment
+    );
+
+    return boilingTimeInSeconds;
+}
+
+function getDeviceAltitude() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject("Geolocation is not supported by your browser.");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const altitude = position.coords.altitude; // Altitude in meters
+                if (altitude !== null && altitude !== undefined) {
+                    resolve(altitude);
+                } else {
+                    reject("Altitude data is not available from this device.");
+                }
+            },
+            (error) => {
+                reject(`Error getting location: ${error.message}`);
+            },
+            { enableHighAccuracy: true } // Request more accurate readings if possible
+        );
+    });
+}
+
+function setEggSize(size) {
+    if (size === undefined) {
+        content.innerHTML = `
+        <p>Wat is het formaat van het ei? bij twijfel kies Middelgroot.</p>
+        <button onclick="setEggSize('small')">Kleine eieren</button>
+        <button onclick="setEggSize('medium')">Middelgrote eieren</button>
+        <button onclick="setEggSize('large')">Grote eieren</button>
+        <button onclick="setEggSize('extraLarge')">Extra grote eieren</button>
+        `;
+    }
+    else {
+        eggSize = size;
+        prepareForBoiling();
+    }
+
+}
+
+function prepareForBoiling() {
     content.innerHTML = `
     <p>Zet een pan water op het gasfornuis en voeg een beetje zout toe.</p>
     <button onclick="askWaterBoiling()">Het water kookt nog niet</button>
@@ -24,7 +110,7 @@ function askWaterBoiling(isBoiling = false) {
 }
 
 function startTimer() {
-    const time = eggType === 'hard' ? 10 * 60 : 8 * 60; // Tijd in seconden
+    const time = calculateEggBoilingTimeInSeconds(eggSize, 20, eggConsistency, altitude);
     let remainingTime = time;
 
     content.innerHTML = `
@@ -95,18 +181,51 @@ function closeOverlay() {
     overlay.classList.add('hidden');
 }
 
-function restartApp() {
-    // Reset de inhoud naar de oorspronkelijke vraag
-    const restartButton = document.getElementById('restart-button');
-    if (restartButton) {
-        restartButton.remove();
+function setEggConsistency(consistency) {
+    //check if consistency is undefined
+    if (consistency === undefined) {
+        content.innerHTML = `
+    <p>Hoe wil je je ei?</p>
+    <button onclick="setEggConsistency('hard')">Hardgekookt</button>
+    <button onclick="setEggConsistency('medium')">Met een zachte kern</button>
+    <button onclick="setEggConsistency('soft')">Zachtgekookt</button>
+  `;
+    } else {
+        eggConsistency = consistency;
+        setEggSize();
+    }
+}
+
+function confirmAltitude(confirmation) {
+    //check if confirmation is undefined
+    if (confirmation === undefined) {
+        getDeviceAltitude().then((altitude) => {
+            altitude = altitude;
+            content.innerHTML = `
+            <p>Je bent op een hoogte van ${altitude} meter ${altitude >= 0 ? 'boven' : 'onder'} zeeniveau. Is dit correct?</p>
+            <button onclick="confirmAltitude(true)">Ja</button>
+            <button onclick="confirmAltitude(false)">Nee</button>
+            `;
+
+        }).catch((error) => {
+            altitude = 0;
+            content.innerHTML = `
+            <p>We kunnen via je apparaat niet bepalen op welke hoogte je bent. We gaan er vanuit dat je op zeeniveau bent.</p>
+            <button onclick="confirmAltitude(true)">Ok</button>
+            `;
+        });
     }
 
-    content.innerHTML = `
-    <p>Hoe wil je je ei?</p>
-    <button onclick="setEggPreference('hard')">Hardgekookt</button>
-    <button onclick="setEggPreference('soft')">Zachtgekookt</button>
-  `;
+    else if (confirmation) {
+        setEggConsistency();
+    } else {
+        setEggConsistency();
+    }
 }
+
+
+function restartApp() {
+    confirmAltitude();
+};
 
 restartApp(); // Start de app
