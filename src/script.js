@@ -199,8 +199,8 @@ function setEggConsistency(consistency) {
 function confirmAltitude(confirmation) {
     //check if confirmation is undefined
     if (confirmation === undefined) {
-        getDeviceAltitude().then((altitude) => {
-            altitude = altitude;
+        getDeviceAltitude().then((alt) => {
+            altitude = Math.round(alt);
             content.innerHTML = `
             <p>Je bent op een hoogte van ${altitude} meter ${altitude >= 0 ? 'boven' : 'onder'} zeeniveau. Is dit correct?</p>
             <button onclick="confirmAltitude(true)">Ja</button>
