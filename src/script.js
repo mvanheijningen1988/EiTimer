@@ -12,24 +12,24 @@ function calculateEggBoilingTimeInSeconds(size, startTemp, desiredConsistency, a
     const timetable = {
 
         small: {
-            soft: 240,
-            medium: 300,
-            hard: 360
+            soft: 300, // 5 minutes
+            medium: 390, // 6.5 minutes
+            hard: 480 // 8 minutes
         },
         medium: {
-            soft: 300,
-            medium: 360,
-            hard: 420
+            soft: 360, // 6 minutes
+            medium: 450, // 7.5 minutes
+            hard: 540 // 9 minuten
         },
         large: {
-            soft: 360,
-            medium: 420,
-            hard: 480
+            soft: 390, // 6.5 minuten
+            medium: 480, // 8 minuten
+            hard: 570 // 9.5 minuten
         },
         extraLarge: {
-            soft: 420,
-            medium: 480,
-            hard: 540
+            soft: 420, // 7 minuten
+            medium: 510, // 8.5 minuten
+            hard: 600 // 10 minuten
         }
     }
     // Validate egg size
